@@ -31,6 +31,15 @@
           <h3>Ask the community</h3>
           <input id="q-title" placeholder="Short title" />
           <textarea id="q-body" placeholder="Describe your doubt or topic"></textarea>
+          <input id="q-author" placeholder="Your name (optional)" />
+          <input id="q-designation" placeholder="Your designation (optional)" />
+          <div class="form-row">
+            <label class="file-input">
+              <input id="q-photo" type="file" accept="image/*" capture="user" />
+              Upload photo
+            </label>
+            <img id="q-photo-preview" class="preview hidden" alt="author photo preview" />
+          </div>
           <div class="form-row">
             <input id="q-tags" placeholder="Tags (comma separated)" />
             <button id="post-question" class="primary">Post</button>
@@ -45,6 +54,15 @@
           <h2>Ask a question</h2>
           <input id="ask-title" placeholder="Title" />
           <textarea id="ask-body" placeholder="Explain in detail"></textarea>
+          <input id="ask-name" placeholder="Your name (optional)" />
+          <input id="ask-designation" placeholder="Your designation (optional)" />
+          <div class="form-row">
+            <label class="file-input">
+              <input id="ask-photo" type="file" accept="image/*" capture="user" />
+              Upload photo
+            </label>
+            <img id="ask-photo-preview" class="preview hidden" alt="author photo preview" />
+          </div>
           <div class="form-row">
             <input id="ask-tags" placeholder="Tags" />
             <button id="ask-post" class="primary">Submit</button>
