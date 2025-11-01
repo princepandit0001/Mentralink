@@ -19,14 +19,14 @@
     }
     if(!localStorage.getItem(storageKeys.mentors)){
       const sample = [
-        {id:nowId(),name:'Asha Rao',role:'Software Engineer · ML',contact:'https://linkedin.com/in/asha'},
-        {id:nowId(),name:'Ravi Kumar',role:'SWE Intern',contact:''}
+        {id:nowId(),name:'Asha Rao',role:'Software Engineer · ML',contact:'https://linkedin.com/in/asha',photo:''},
+        {id:nowId(),name:'Ravi Kumar',role:'SWE Intern',contact:'',photo:''}
       ];
       localStorage.setItem(storageKeys.mentors, JSON.stringify(sample))
     }
     if(!localStorage.getItem(storageKeys.events)){
       const sample = [
-        {id:nowId(),title:'Resume clinic + AMA',date:new Date(Date.now()+3*86400000).toISOString(),desc:'Drop resumes and get quick feedback.'}
+        {id:nowId(),title:'Resume clinic + AMA',date:new Date(Date.now()+3*86400000).toISOString(),desc:'Drop resumes and get quick feedback.',organization:'Career Center',organizer:'Priya Singh',topic:'Resumes & Interview Prep',organizerPhoto:''}
       ];
       localStorage.setItem(storageKeys.events, JSON.stringify(sample))
     }
@@ -64,7 +64,12 @@
     const list = byId('mentors-list'); list.innerHTML=''
     read(storageKeys.mentors).forEach(m=>{
       const el = document.createElement('div'); el.className='mentor'
-      el.innerHTML = `<h4>${escapeHtml(m.name)}</h4><div class="muted">${escapeHtml(m.role)}</div><div class="small">${m.contact?`<a href="${escapeHtml(m.contact)}" target="_blank">Contact</a>`:'—'}</div>`
+      const img = m.photo ? `<img class="avatar" src="${m.photo}" alt="${escapeHtml(m.name)}"/>` : ''
+      el.innerHTML = `<div class="mentor-row">${img}<div>
+        <h4>${escapeHtml(m.name)}</h4>
+        <div class="muted">${escapeHtml(m.role)}</div>
+        <div class="small">${m.contact?`<a href="${escapeHtml(m.contact)}" target="_blank">Contact</a>`:'—'}</div>
+      </div></div>`
       list.appendChild(el)
     })
   }
@@ -73,7 +78,13 @@
     const list = byId('events-list'); list.innerHTML=''
     read(storageKeys.events).forEach(e=>{
       const el = document.createElement('div'); el.className='event'
-      el.innerHTML = `<h4>${escapeHtml(e.title)}</h4><div class="muted">${new Date(e.date).toLocaleString()}</div><div class="small">${escapeHtml(e.desc||'')}</div>`
+      const img = e.organizerPhoto ? `<img class="avatar" src="${e.organizerPhoto}" alt="${escapeHtml(e.organizer)}"/>` : ''
+      el.innerHTML = `<div style="display:flex;gap:10px;align-items:flex-start">${img}<div>
+        <h4>${escapeHtml(e.title)}</h4>
+        <div class="muted">${new Date(e.date).toLocaleString()} • ${escapeHtml(e.organization||'')}</div>
+        <div class="small">Organizer: ${escapeHtml(e.organizer||'—')} • Topic: ${escapeHtml(e.topic||'—')}</div>
+        <div style="margin-top:6px" class="small">${escapeHtml(e.desc||'')}</div>
+      </div></div>`
       list.appendChild(el)
     })
   }
@@ -124,19 +135,38 @@
 
     // mentor form
     byId('add-mentor-toggle').addEventListener('click', ()=> byId('mentor-form').classList.toggle('hidden'))
+    // mentor photo handling
+    byId('m-photo').addEventListener('change', e=> handleFilePreview(e.target, 'm-photo-preview'))
     byId('m-add').addEventListener('click', ()=>{
       const name=byId('m-name').value.trim(); const role=byId('m-role').value.trim(); const contact=byId('m-contact').value.trim()
       if(!name||!role){ alert('Name and role are required'); return }
-      const mentors = read(storageKeys.mentors); mentors.push({id:nowId(),name,role,contact}); write(storageKeys.mentors,mentors); renderMentors(); byId('m-name').value=''; byId('m-role').value=''; byId('m-contact').value=''; byId('mentor-form').classList.add('hidden')
+      const photo = byId('m-photo').dataset.url || ''
+      const mentors = read(storageKeys.mentors); mentors.push({id:nowId(),name,role,contact,photo}); write(storageKeys.mentors,mentors); renderMentors(); byId('m-name').value=''; byId('m-role').value=''; byId('m-contact').value=''; byId('m-photo').value=''; byId('m-photo').removeAttribute('data-url'); byId('m-photo-preview').classList.add('hidden'); byId('mentor-form').classList.add('hidden')
     })
 
     // events
     byId('add-event-toggle').addEventListener('click', ()=> byId('event-form').classList.toggle('hidden'))
+    // organizer photo handling
+    byId('e-organizer-photo').addEventListener('change', e=> handleFilePreview(e.target, 'e-org-preview'))
     byId('e-add').addEventListener('click', ()=>{
-      const t=byId('e-title').value.trim(); const d=byId('e-date').value; const desc=byId('e-desc').value.trim()
+      const t=byId('e-title').value.trim(); const d=byId('e-date').value; const desc=byId('e-desc').value.trim(); const org=byId('e-org').value.trim(); const organizer=byId('e-organizer').value.trim(); const topic=byId('e-topic').value.trim()
       if(!t||!d){ alert('Title and date required'); return }
-      const events = read(storageKeys.events); events.push({id:nowId(),title:t,date:new Date(d).toISOString(),desc}); write(storageKeys.events,events); renderEvents(); byId('e-title').value=''; byId('e-desc').value=''; byId('event-form').classList.add('hidden')
+      const organizerPhoto = byId('e-organizer-photo').dataset.url || ''
+      const events = read(storageKeys.events); events.push({id:nowId(),title:t,date:new Date(d).toISOString(),desc,organization:org,organizer,topic,organizerPhoto}); write(storageKeys.events,events); renderEvents(); byId('e-title').value=''; byId('e-desc').value=''; byId('e-org').value=''; byId('e-organizer').value=''; byId('e-topic').value=''; byId('e-organizer-photo').value=''; byId('e-organizer-photo').removeAttribute('data-url'); byId('e-org-preview').classList.add('hidden'); byId('event-form').classList.add('hidden')
     })
+
+    // helper: file -> data URL preview
+    function handleFilePreview(inputEl, previewId){
+      const file = inputEl.files && inputEl.files[0]; const preview = byId(previewId)
+      if(!file){ preview.classList.add('hidden'); inputEl.removeAttribute('data-url'); return }
+      const reader = new FileReader()
+      reader.onload = ()=>{
+        inputEl.dataset.url = reader.result
+        preview.src = reader.result
+        preview.classList.remove('hidden')
+      }
+      reader.readAsDataURL(file)
+    }
 
     // groups
     byId('g-create').addEventListener('click', ()=>{

@@ -62,6 +62,13 @@
           <input id="m-role" placeholder="Role / Field" />
           <input id="m-contact" placeholder="Contact / LinkedIn (optional)" />
           <div class="form-row">
+            <label class="file-input">
+              <input id="m-photo" type="file" accept="image/*" capture="user" />
+              Upload / take photo
+            </label>
+            <img id="m-photo-preview" class="preview hidden" alt="mentor photo preview" />
+          </div>
+          <div class="form-row">
             <button id="m-add" class="primary">Add Mentor</button>
           </div>
         </div>
@@ -76,7 +83,17 @@
           <h3>Create event / AMA</h3>
           <input id="e-title" placeholder="Event title" />
           <input id="e-date" type="datetime-local" />
+          <input id="e-org" placeholder="Organization name" />
+          <input id="e-organizer" placeholder="Organizer name" />
+          <input id="e-topic" placeholder="Topic" />
           <textarea id="e-desc" placeholder="Short description"></textarea>
+          <div class="form-row">
+            <label class="file-input">
+              <input id="e-organizer-photo" type="file" accept="image/*" capture="user" />
+              Upload organizer photo
+            </label>
+            <img id="e-org-preview" class="preview hidden" alt="organizer photo preview" />
+          </div>
           <div class="form-row">
             <button id="e-add" class="primary">Create</button>
           </div>
