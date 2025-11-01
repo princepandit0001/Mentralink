@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mentralink — student community</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <h1 class="logo">Mentralink</h1>
+        <nav class="main-nav">
+          <button data-route="home" class="nav-btn active">Home</button>
+          <button data-route="ask" class="nav-btn">Ask</button>
+          <button data-route="mentors" class="nav-btn">Mentors</button>
+          <button data-route="events" class="nav-btn">Events</button>
+          <button data-route="collab" class="nav-btn">Collaborate</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="home" class="page">
+        <div class="toolbar">
+          <input id="search" placeholder="Search questions, mentors, events" />
+          <button id="new-question-toggle" class="primary">+ New Question</button>
+        </div>
+
+        <div id="new-question" class="card hidden">
+          <h3>Ask the community</h3>
+          <input id="q-title" placeholder="Short title" />
+          <textarea id="q-body" placeholder="Describe your doubt or topic"></textarea>
+          <div class="form-row">
+            <input id="q-tags" placeholder="Tags (comma separated)" />
+            <button id="post-question" class="primary">Post</button>
+          </div>
+        </div>
+
+        <div id="feed"></div>
+      </section>
+
+      <section id="ask" class="page hidden">
+        <div class="card">
+          <h2>Ask a question</h2>
+          <input id="ask-title" placeholder="Title" />
+          <textarea id="ask-body" placeholder="Explain in detail"></textarea>
+          <div class="form-row">
+            <input id="ask-tags" placeholder="Tags" />
+            <button id="ask-post" class="primary">Submit</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="mentors" class="page hidden">
+        <div class="toolbar">
+          <button id="add-mentor-toggle" class="primary">+ Add Mentor</button>
+        </div>
+        <div id="mentor-form" class="card hidden">
+          <h3>Add a mentor</h3>
+          <input id="m-name" placeholder="Name" />
+          <input id="m-role" placeholder="Role / Field" />
+          <input id="m-contact" placeholder="Contact / LinkedIn (optional)" />
+          <div class="form-row">
+            <button id="m-add" class="primary">Add Mentor</button>
+          </div>
+        </div>
+        <div id="mentors-list"></div>
+      </section>
+
+      <section id="events" class="page hidden">
+        <div class="toolbar">
+          <button id="add-event-toggle" class="primary">+ New Event</button>
+        </div>
+        <div id="event-form" class="card hidden">
+          <h3>Create event / AMA</h3>
+          <input id="e-title" placeholder="Event title" />
+          <input id="e-date" type="datetime-local" />
+          <textarea id="e-desc" placeholder="Short description"></textarea>
+          <div class="form-row">
+            <button id="e-add" class="primary">Create</button>
+          </div>
+        </div>
+        <div id="events-list"></div>
+      </section>
+
+      <section id="collab" class="page hidden">
+        <div class="card">
+          <h2>Collaboration</h2>
+          <p>Create or join study groups, project teams, or hackathon squads.</p>
+          <div class="form-row">
+            <input id="g-name" placeholder="Group name" />
+            <input id="g-topic" placeholder="Topic/skill" />
+            <button id="g-create" class="primary">Create Group</button>
+          </div>
+        </div>
+        <div id="groups-list"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">Built with ❤️ for learners • Mentralink (prototype)</div>
+    </footer>
+
+    <script src="js/app.js" defer></script>
+  </body>
+</html>
