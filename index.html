@@ -16,7 +16,7 @@
           <button data-route="mentors" class="nav-btn">Mentors</button>
           <button data-route="events" class="nav-btn">Events</button>
           <button data-route="collab" class="nav-btn">Collaborate</button>
-          <button data-route="admin" class="nav-btn">Admin</button>
+          <a href="admin.html" class="nav-btn">Admin</a>
         </nav>
       </div>
     </header>
@@ -133,41 +133,7 @@
         <div id="groups-list"></div>
       </section>
 
-      <section id="admin" class="page hidden">
-        <div class="card" id="admin-login-card">
-          <h2>Admin login</h2>
-          <input id="admin-user" placeholder="Username" />
-          <input id="admin-pass" type="password" placeholder="Password" />
-          <div class="form-row">
-            <button id="admin-login" class="primary">Login</button>
-            <button id="admin-logout" class="hidden">Logout</button>
-          </div>
-          <div id="admin-msg" class="small muted">Login with admin credentials to manage site content.</div>
-        </div>
-
-        <div id="admin-panel" class="card hidden">
-          <h2>Admin panel</h2>
-          <div class="admin-section">
-            <h3>Posts</h3>
-            <div id="admin-posts" class="admin-list"></div>
-          </div>
-          <div class="admin-section">
-            <h3>Mentors</h3>
-            <div id="admin-mentors" class="admin-list"></div>
-          </div>
-          <div class="admin-section">
-            <h3>Events</h3>
-            <div id="admin-events" class="admin-list"></div>
-          </div>
-          <div class="admin-section">
-            <h3>Groups</h3>
-            <div id="admin-groups" class="admin-list"></div>
-          </div>
-          <div class="form-row" style="margin-top:12px">
-            <button id="admin-clear-storage" class="primary">Clear all local data</button>
-          </div>
-        </div>
-      </section>
+      <!-- Admin moved to admin.html -->
     </main>
 
     <footer class="site-footer">

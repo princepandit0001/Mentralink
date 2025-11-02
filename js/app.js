@@ -8,12 +8,7 @@
   const byId = id => document.getElementById(id)
   const nowId = ()=> Date.now().toString(36)
 
-  // simple admin credentials (prototype) — change as needed
-  const adminCreds = {user: 'admin', pass: 'admin123'}
-
-  function isAdmin(){ return sessionStorage.getItem('ml_admin_auth') === '1' }
-  function setAdminSession(){ sessionStorage.setItem('ml_admin_auth','1') }
-  function clearAdminSession(){ sessionStorage.removeItem('ml_admin_auth') }
+  
 
   // Initial sample data if none
   function seed(){
@@ -163,8 +158,7 @@
   function showRoute(route){
     $$('.page').forEach(p=>p.classList.add('hidden'))
     const el = byId(route); if(el) el.classList.remove('hidden')
-    $$('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.route===route))
-    if(route === 'admin') renderAdmin()
+  $$('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.route===route))
   }
 
   function bind(){
@@ -235,22 +229,7 @@
       const groups = read(storageKeys.groups); groups.push({id:nowId(),name,topic,members:1}); write(storageKeys.groups,groups); renderGroups(); byId('g-name').value=''; byId('g-topic').value=''
     })
 
-    // admin login/logout/controls
-    const adminLoginBtn = byId('admin-login')
-    const adminLogoutBtn = byId('admin-logout')
-    const adminClearBtn = byId('admin-clear-storage')
-    if(adminLoginBtn){
-      adminLoginBtn.addEventListener('click', ()=>{
-        const u = byId('admin-user').value.trim(), p = byId('admin-pass').value
-        if(u === adminCreds.user && p === adminCreds.pass){ setAdminSession(); renderAdmin(); alert('Admin logged in') }
-        else alert('Invalid admin credentials')
-      })
-    }
-    if(adminLogoutBtn){ adminLogoutBtn.addEventListener('click', ()=>{ clearAdminSession(); renderAdmin(); alert('Logged out') }) }
-    if(adminClearBtn){ adminClearBtn.addEventListener('click', ()=>{
-      if(!confirm('Clear all data in localStorage? This cannot be undone.')) return
-      localStorage.clear(); seed(); renderFeed(); renderMentors(); renderEvents(); renderGroups(); renderAdmin(); alert('Local data cleared and reseeded')
-    }) }
+    
 
     // feed actions (event delegation)
     // handle clicks and file changes inside feed (event delegation)
@@ -300,63 +279,7 @@
       }
     })
     
-    // admin action helpers: deletion functions and admin renderer
-    function deleteById(key, id){ const arr = read(key).filter(x=>x.id!==id); write(key, arr) }
-    function renderAdmin(){
-      const panel = byId('admin-panel'); const loginCard = byId('admin-login-card')
-      if(!panel || !loginCard) return
-      if(!isAdmin()){
-        panel.classList.add('hidden'); loginCard.classList.remove('hidden'); byId('admin-logout').classList.add('hidden'); return
-      }
-      // admin logged in
-      loginCard.classList.add('hidden'); panel.classList.remove('hidden'); byId('admin-logout').classList.remove('hidden')
-
-      // posts
-      const ap = byId('admin-posts'); ap.innerHTML = ''
-      read(storageKeys.posts).forEach(p=>{
-        const item = document.createElement('div'); item.className = 'admin-item'
-        item.innerHTML = `<div><strong>${escapeHtml(p.title)}</strong><div class="meta">${escapeHtml(p.authorName||'Anonymous')} • ${new Date(p.created).toLocaleString()}</div></div>
-          <div class="admin-controls"><button class="primary" data-action="admin-delete-post" data-id="${p.id}">Delete</button></div>`
-        ap.appendChild(item)
-      })
-
-      // mentors
-      const am = byId('admin-mentors'); am.innerHTML = ''
-      read(storageKeys.mentors).forEach(m=>{
-        const item = document.createElement('div'); item.className = 'admin-item'
-        item.innerHTML = `<div>${escapeHtml(m.name)} <div class="meta">${escapeHtml(m.role)}</div></div><div class="admin-controls"><button data-action="admin-delete-mentor" data-id="${m.id}">Delete</button></div>`
-        am.appendChild(item)
-      })
-
-      // events
-      const ae = byId('admin-events'); ae.innerHTML = ''
-      read(storageKeys.events).forEach(ev=>{
-        const item = document.createElement('div'); item.className = 'admin-item'
-        item.innerHTML = `<div>${escapeHtml(ev.title)} <div class="meta">${escapeHtml(ev.organization||'')} • ${new Date(ev.date).toLocaleString()}</div></div><div class="admin-controls"><button data-action="admin-delete-event" data-id="${ev.id}">Delete</button></div>`
-        ae.appendChild(item)
-      })
-
-      // groups
-      const ag = byId('admin-groups'); ag.innerHTML = ''
-      read(storageKeys.groups).forEach(g=>{
-        const item = document.createElement('div'); item.className = 'admin-item'
-        item.innerHTML = `<div>${escapeHtml(g.name)} <div class="meta">${escapeHtml(g.topic)}</div></div><div class="admin-controls"><button data-action="admin-delete-group" data-id="${g.id}">Delete</button></div>`
-        ag.appendChild(item)
-      })
-
-      // wire admin list buttons (delegated)
-      panel.querySelectorAll('button[data-action^="admin-delete-"]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const action = btn.dataset.action; const id = btn.dataset.id
-          if(!confirm('Are you sure you want to delete this item?')) return
-          if(action==='admin-delete-post'){ deleteById(storageKeys.posts, id); renderFeed(); }
-          if(action==='admin-delete-mentor'){ deleteById(storageKeys.mentors, id); renderMentors(); }
-          if(action==='admin-delete-event'){ deleteById(storageKeys.events, id); renderEvents(); }
-          if(action==='admin-delete-group'){ deleteById(storageKeys.groups, id); renderGroups(); }
-          renderAdmin()
-        })
-      })
-    }
+    
   }
 
   // boot
