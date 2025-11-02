@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mentralink — Admin</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+      body{padding:20px}
+      .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    </style>
+  </head>
+  <body>
+    <div class="top container">
+      <h1>Mentralink — Admin</h1>
+      <div>
+        <a href="index.html">Return to site</a>
+      </div>
+    </div>
+
+    <main class="container">
+      <section id="admin-login">
+        <div class="card">
+          <h2>Admin login</h2>
+          <input id="login-user" placeholder="Username" />
+          <input id="login-pass" type="password" placeholder="Password" />
+          <div class="form-row">
+            <button id="login-btn" class="primary">Login</button>
+            <button id="logout-btn" class="primary hidden">Logout</button>
+          </div>
+          <div class="small muted">Use the admin credentials to manage content (prototype only).</div>
+        </div>
+      </section>
+
+      <section id="admin-panel" class="card hidden">
+        <h2>Admin panel</h2>
+        <div class="admin-section">
+          <h3>Posts</h3>
+          <div id="list-posts" class="admin-list"></div>
+        </div>
+        <div class="admin-section">
+          <h3>Mentors</h3>
+          <div id="list-mentors" class="admin-list"></div>
+        </div>
+        <div class="admin-section">
+          <h3>Events</h3>
+          <div id="list-events" class="admin-list"></div>
+        </div>
+        <div class="admin-section">
+          <h3>Groups</h3>
+          <div id="list-groups" class="admin-list"></div>
+        </div>
+
+        <div class="form-row" style="margin-top:12px">
+          <button id="clear-storage" class="primary">Clear all local data</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/admin.js"></script>
+  </body>
+</html>
