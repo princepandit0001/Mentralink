@@ -48,6 +48,8 @@
     const posts = read(storageKeys.posts).slice().sort((a,b)=>b.votes - a.votes || b.created - a.created)
     posts.filter(p=> (p.title+p.body+(p.tags||[]).join(' ')).toLowerCase().includes(q.toLowerCase())).forEach(p=>{
       const el = document.createElement('div'); el.className='post card'
+      // attach post id to container to make event handling robust
+      el.dataset.postId = p.id
       // build replies list (include author info when available)
       const repliesHtml = (p.replies||[]).map(r=>{
         const rimg = r.authorPhoto ? `<img class="avatar" src="${r.authorPhoto}" alt="${escapeHtml(r.authorName)}"/>` : ''
@@ -59,7 +61,7 @@
       const authorMeta = `${escapeHtml(p.authorName||'Anonymous')} ${p.authorDesignation?`• ${escapeHtml(p.authorDesignation)}`:''}`
 
       el.innerHTML = `<div style="display:flex;gap:10px;align-items:center">${authorImg}<div style="flex:1"><h3 style="margin:0">${escapeHtml(p.title)}</h3><div class="muted small">${authorMeta}</div></div></div>
-        <div class="meta small">${new Date(p.created).toLocaleString()} • <span class="muted">${p.votes} votes</span></div>
+        <div class="meta small">${new Date(p.created).toLocaleString()} • <span class="muted votes-count">${p.votes} votes</span></div>
         <div class="body">${escapeHtml(p.body)}</div>
         <div class="tags">${(p.tags||[]).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
         <div class="actions small">
@@ -84,6 +86,28 @@
           <div class="replies">${repliesHtml}</div>
         </div>`
       target.appendChild(el)
+      // Attach a direct upvote handler to avoid delegation ambiguity
+      const upBtn = el.querySelector('button[data-action="upvote"]')
+      if(upBtn){
+        upBtn.addEventListener('click', ev=>{
+          ev.stopPropagation()
+          // resolve the post id from the closest post container to be robust
+          const postEl = upBtn.closest('.post')
+          const idToInc = postEl && postEl.dataset.postId
+          const posts = read(storageKeys.posts)
+          const post = posts.find(x=>x.id===idToInc)
+          if(post){
+            post.votes = (post.votes||0) + 1
+            write(storageKeys.posts, posts)
+            // update only the votes display for this post to avoid reordering confusion
+            const votesEl = postEl && postEl.querySelector('.votes-count')
+            if(votesEl) votesEl.textContent = `${post.votes} votes`
+            console.debug('upvote', {resolvedId: idToInc, votes: post.votes})
+          } else {
+            console.debug('upvote: post not found', {resolvedId: idToInc, closureId: p.id})
+          }
+        })
+      }
     })
   }
 
@@ -206,20 +230,36 @@
     // feed actions (event delegation)
     // handle clicks and file changes inside feed (event delegation)
     byId('feed').addEventListener('click', e=>{
-      const btn = e.target.closest('button'); if(btn){ const action = btn.dataset.action; const id = btn.dataset.id
-        if(action==='upvote'){ const posts = read(storageKeys.posts); const p = posts.find(x=>x.id===id); if(p){ p.votes=(p.votes||0)+1; write(storageKeys.posts,posts); renderFeed() } }
-        if(action==='details'){ const posts = read(storageKeys.posts); const p=posts.find(x=>x.id===id); if(p) alert(`Title: ${p.title}\n\n${p.body}`) }
-        if(action==='reply-toggle'){ // toggle the reply form for this post
-          const postEl = e.target.closest('.post'); if(!postEl) return; const form = postEl.querySelector('.reply-form'); if(form) form.classList.toggle('hidden')
-        }
-        if(action==='reply-submit'){
-          const form = e.target.closest('.reply-form'); const textarea = form.querySelector('.reply-input'); const text = textarea.value.trim(); if(!text) return alert('Enter a reply')
-          const name = form.querySelector('.reply-name').value.trim(); const designation = form.querySelector('.reply-designation').value.trim(); const photo = form.querySelector('.reply-photo-input').dataset.url || ''
-          const posts = read(storageKeys.posts); const p = posts.find(x=>x.id===id); if(!p) return
-          p.replies = p.replies || []
-          p.replies.push({id:nowId(),text,created:Date.now(),authorName:name,authorDesignation:designation,authorPhoto:photo})
-          write(storageKeys.posts,posts); renderFeed()
-        }
+      const btn = e.target.closest('button');
+      if(!btn) return
+      const action = btn.dataset.action
+      // prefer explicit id on button; fall back to enclosing post container's data-post-id
+  const postEl = btn.closest('.post')
+  // prefer the post container's id (more reliable) then fall back to button dataset
+  const id = (postEl && postEl.dataset.postId) || btn.dataset.id
+  // debug: if something goes wrong this will show in console
+  console.debug('feed click', {action, resolvedId: id, buttonId: btn.dataset.id, postElId: postEl && postEl.dataset.postId})
+
+      // upvote is handled by per-post click handlers attached during renderFeed
+
+      if(action==='details'){
+        const posts = read(storageKeys.posts); const p = posts.find(x=>x.id===id); if(p) alert(`Title: ${p.title}\n\n${p.body}`)
+        return
+      }
+
+      if(action==='reply-toggle'){
+        if(!postEl) return; const form = postEl.querySelector('.reply-form'); if(form) form.classList.toggle('hidden')
+        return
+      }
+
+      if(action==='reply-submit'){
+        const form = btn.closest('.reply-form'); const textarea = form.querySelector('.reply-input'); const text = textarea.value.trim(); if(!text) return alert('Enter a reply')
+        const name = form.querySelector('.reply-name').value.trim(); const designation = form.querySelector('.reply-designation').value.trim(); const photo = form.querySelector('.reply-photo-input').dataset.url || ''
+        const posts = read(storageKeys.posts); const p = posts.find(x=>x.id===id); if(!p) return
+        p.replies = p.replies || []
+        p.replies.push({id:nowId(),text,created:Date.now(),authorName:name,authorDesignation:designation,authorPhoto:photo})
+        write(storageKeys.posts,posts); renderFeed()
+        return
       }
     })
 
